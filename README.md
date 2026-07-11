@@ -1,6 +1,6 @@
 # MAS-DecStream
 
-MAS-DecStream is a runnable prototype for decentralized stream-task scheduling in heterogeneous MEC environments. It implements rule-based and LLM-assisted Contract-Net negotiation between representative edge-cluster agents.
+MAS-DecStream is a  agentic-AI framework for decentralized stream-task scheduling in heterogeneous MEC environments. It  implements LLM-assisted Contract-Net negotiation between representative edge-cluster agents.
 
 The clean project contains only the scenarios used in the paper.
 
