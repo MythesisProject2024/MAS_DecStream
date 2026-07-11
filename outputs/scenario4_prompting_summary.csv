@@ -1,0 +1,2 @@
+strategy,llm_label,cases,action_accuracy,reason_accuracy,reasoning_accuracy,unsafe_candidate_rejection_rate,avg_decision_time_ms,prompt_tokens_est,completion_tokens_est,total_tokens_est
+zero_shot,mock,1,1.0000,1.0000,1.0000,1.0000,0.04,170,34,204

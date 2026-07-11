@@ -1,0 +1,317 @@
+metadata:
+  scenario: "Scenario 4: Impact of Prompting Strategy on LLM-Based Negotiation"
+  output_format: "json"
+  allowed_decisions:
+    - accept
+    - refuse
+  allowed_reasons:
+    - resource_feasible
+    - best_utility_feasible
+    - latency_risk
+    - resource_overload
+    - bandwidth_risk
+    - data_drift
+    - conflict_risk
+    - priority_requirement
+    - contextual_risk
+
+zero_shot:
+  name: "Zero-shot"
+  template: |
+    You are a responder edge-cluster agent in an LLM-assisted Contract-Net negotiation.
+    Decide whether your represented cluster should accept or refuse the offloading request.
+
+    Task profile:
+    {task_profile}
+
+    Candidate agent: {candidate_agent}
+    Candidate cluster type: {candidate_cluster_type}
+    Contextual warning:
+    {contextual_warning}
+
+    Allowed decisions: accept, refuse.
+    Allowed reasons: resource_feasible, best_utility_feasible, latency_risk, resource_overload, bandwidth_risk, data_drift, conflict_risk, priority_requirement, contextual_risk.
+
+    Return only valid JSON:
+    {{
+      "decision": "accept or refuse",
+      "reason": "one allowed reason",
+      "natural_language": "short explanation"
+    }}
+
+few_shot:
+  name: "Few-shot"
+  template: |
+    You are a responder edge-cluster agent in an LLM-assisted Contract-Net negotiation.
+    Decide whether your represented cluster should accept or refuse the offloading request.
+
+    Examples:
+    Input: A low-latency video task has a warning about future latency degradation.
+    Output:
+    {{
+      "decision": "refuse",
+      "reason": "latency_risk",
+      "natural_language": "I refuse because the task is latency-sensitive and the warning indicates possible deadline violation."
+    }}
+
+    Input: A generative-AI stream task requires GPU acceleration and the cluster is a low-latency GPU edge cluster with no warning.
+    Output:
+    {{
+      "decision": "accept",
+      "reason": "resource_feasible",
+      "natural_language": "I accept because the cluster profile matches the task requirements and no major QoS risk is indicated."
+    }}
+
+    Input: A task includes an abnormal workload-spike warning not captured by prediction.
+    Output:
+    {{
+      "decision": "refuse",
+      "reason": "data_drift",
+      "natural_language": "I refuse because the qualitative warning indicates data drift and future resource saturation risk."
+    }}
+
+    Now evaluate the current case.
+
+    Task profile:
+    {task_profile}
+
+    Candidate agent: {candidate_agent}
+    Candidate cluster type: {candidate_cluster_type}
+    Contextual warning:
+    {contextual_warning}
+
+    Allowed decisions: accept, refuse.
+    Allowed reasons: resource_feasible, best_utility_feasible, latency_risk, resource_overload, bandwidth_risk, data_drift, conflict_risk, priority_requirement, contextual_risk.
+
+    Return only valid JSON:
+    {{
+      "decision": "accept or refuse",
+      "reason": "one allowed reason",
+      "natural_language": "short explanation"
+    }}
+
+cot:
+  name: "Chain-of-thought"
+  template: |
+    You are a responder edge-cluster agent in an LLM-assisted Contract-Net negotiation.
+    Analyze the task requirements, candidate cluster profile, and contextual warning before deciding.
+    Think step by step internally, but do not reveal the reasoning chain. Return only the final JSON.
+
+    Task profile:
+    {task_profile}
+
+    Candidate agent: {candidate_agent}
+    Candidate cluster type: {candidate_cluster_type}
+    Contextual warning:
+    {contextual_warning}
+
+    Check internally:
+    1. Does the cluster profile match the task requirements?
+    2. Is there latency, resource, bandwidth, conflict, priority, or data-drift risk?
+    3. Should the cluster accept or refuse?
+
+    Allowed decisions: accept, refuse.
+    Allowed reasons: resource_feasible, best_utility_feasible, latency_risk, resource_overload, bandwidth_risk, data_drift, conflict_risk, priority_requirement, contextual_risk.
+
+    Return only valid JSON:
+    {{
+      "decision": "accept or refuse",
+      "reason": "one allowed reason",
+      "natural_language": "short explanation"
+    }}
+
+react:
+  name: "ReAct"
+  template: |
+    You are a responder edge-cluster agent in an LLM-assisted Contract-Net negotiation.
+    Use the ReAct reasoning pattern explicitly:
+    Thought: reason about the task and candidate cluster.
+    Action: identify the feasibility or QoS check to perform.
+    Observation: report whether the candidate is safe or unsafe.
+    Final Decision: ACCEPT or REJECT.
+
+    Available structured actions:
+    - check_task_cluster_match
+    - validate_contextual_warning
+    - assess_qos_risk
+
+    Task profile:
+    {task_profile}
+
+    Candidate agent: {candidate_agent}
+    Candidate cluster type: {candidate_cluster_type}
+    Contextual warning:
+    {contextual_warning}
+
+    Ground-truth fields are not visible to you.
+
+    Produce your answer using this format:
+    Thought: <brief reasoning about feasibility and QoS risk>
+    Action: <feasibility or contextual check performed>
+    Observation: <result of the check>
+    Final Decision: <ACCEPT or REJECT>
+    Justification: <short explanation>
+    Final JSON:
+    {{
+      "decision": "accept or refuse",
+      "reason": "one allowed reason",
+      "natural_language": "short explanation"
+    }}
+
+cot_few_shot:
+  name: "CoT + Few-shot"
+  template: |
+    You are a responder edge-cluster agent in an LLM-assisted Contract-Net negotiation.
+    Use the examples to guide the decision. Think step by step internally, but return only the final JSON.
+
+    Examples:
+    Input: A low-latency video task has a warning about future latency degradation.
+    Output:
+    {{
+      "decision": "refuse",
+      "reason": "latency_risk",
+      "natural_language": "I refuse because the task is latency-sensitive and the warning indicates possible deadline violation."
+    }}
+
+    Input: A generative-AI stream task requires GPU acceleration and the cluster is a low-latency GPU edge cluster with no warning.
+    Output:
+    {{
+      "decision": "accept",
+      "reason": "resource_feasible",
+      "natural_language": "I accept because the cluster profile matches the task requirements and no major QoS risk is indicated."
+    }}
+
+    Task profile:
+    {task_profile}
+
+    Candidate agent: {candidate_agent}
+    Candidate cluster type: {candidate_cluster_type}
+    Contextual warning:
+    {contextual_warning}
+
+    Internally check feasibility, QoS risk, contextual warning, and whether the candidate should accept or refuse.
+
+    Allowed decisions: accept, refuse.
+    Allowed reasons: resource_feasible, best_utility_feasible, latency_risk, resource_overload, bandwidth_risk, data_drift, conflict_risk, priority_requirement, contextual_risk.
+
+    Return only valid JSON:
+    {{
+      "decision": "accept or refuse",
+      "reason": "one allowed reason",
+      "natural_language": "short explanation"
+    }}
+
+react_few_shot:
+  name: "ReAct + Few-shot"
+  template: |
+    You are a responder edge-cluster agent in an LLM-assisted Contract-Net negotiation.
+    Use the examples and then follow the ReAct pattern explicitly.
+
+    Examples:
+    Input: A task includes an abnormal workload-spike warning not captured by prediction.
+    Output:
+    Thought: The warning indicates future saturation risk.
+    Action: validate_contextual_warning
+    Observation: The candidate is unsafe because the warning indicates data drift.
+    Final Decision: REJECT
+    Justification: The candidate should refuse due to future workload instability.
+    Final JSON:
+    {{
+      "decision": "refuse",
+      "reason": "data_drift",
+      "natural_language": "I refuse because the qualitative warning indicates data drift and future saturation risk."
+    }}
+
+    Input: A GPU stream task matches a GPU-capable cluster and no warning is present.
+    Output:
+    Thought: The task requirements match the cluster profile.
+    Action: check_task_cluster_match
+    Observation: The candidate appears safe and resource-compatible.
+    Final Decision: ACCEPT
+    Justification: The cluster can host the task without major QoS risk.
+    Final JSON:
+    {{
+      "decision": "accept",
+      "reason": "resource_feasible",
+      "natural_language": "I accept because the cluster matches the task requirements and no major warning is present."
+    }}
+
+    Current case:
+    Task profile:
+    {task_profile}
+
+    Candidate agent: {candidate_agent}
+    Candidate cluster type: {candidate_cluster_type}
+    Contextual warning:
+    {contextual_warning}
+
+    Produce your answer using this format:
+    Thought: <brief reasoning about feasibility and QoS risk>
+    Action: <feasibility or contextual check performed>
+    Observation: <result of the check>
+    Final Decision: <ACCEPT or REJECT>
+    Justification: <short explanation>
+    Final JSON:
+    {{
+      "decision": "accept or refuse",
+      "reason": "one allowed reason",
+      "natural_language": "short explanation"
+    }}
+
+react_few_shot_cot:
+  name: "ReAct + Few-shot + CoT"
+  template: |
+    You are a responder edge-cluster agent in an LLM-assisted Contract-Net negotiation.
+    Use the examples, reason step by step, then follow the ReAct pattern explicitly.
+
+    Examples:
+    Input: A low-latency task has predicted deadline risk.
+    Output:
+    Thought: The task is latency-sensitive, so deadline risk dominates the decision.
+    Action: assess_qos_risk
+    Observation: The candidate is unsafe because the latency constraint may be violated.
+    Final Decision: REJECT
+    Justification: The candidate should refuse due to latency risk.
+    Final JSON:
+    {{
+      "decision": "refuse",
+      "reason": "latency_risk",
+      "natural_language": "I refuse because the latency-sensitive task may violate its deadline."
+    }}
+
+    Input: A resource-compatible task has no contextual warnings.
+    Output:
+    Thought: The task requirements are compatible and no warning suggests future risk.
+    Action: check_task_cluster_match
+    Observation: The candidate is safe and feasible.
+    Final Decision: ACCEPT
+    Justification: The cluster can safely host the task.
+    Final JSON:
+    {{
+      "decision": "accept",
+      "reason": "resource_feasible",
+      "natural_language": "I accept because the cluster is resource-compatible and no warning is present."
+    }}
+
+    Current case:
+    Task profile:
+    {task_profile}
+
+    Candidate agent: {candidate_agent}
+    Candidate cluster type: {candidate_cluster_type}
+    Contextual warning:
+    {contextual_warning}
+
+    Step-by-step, consider task requirements, cluster suitability, warnings, and QoS risk before deciding.
+    Produce your answer using this format:
+    Thought: <brief step-by-step reasoning>
+    Action: <feasibility or contextual check performed>
+    Observation: <result of the check>
+    Final Decision: <ACCEPT or REJECT>
+    Justification: <short explanation>
+    Final JSON:
+    {{
+      "decision": "accept or refuse",
+      "reason": "one allowed reason",
+      "natural_language": "short explanation"
+    }}

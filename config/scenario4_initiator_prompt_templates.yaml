@@ -1,0 +1,282 @@
+metadata:
+  scenario: "Scenario 4-B: End-to-End LLM-MR-CNP Negotiation Evaluation"
+  output_format: "json"
+  allowed_cfp_intents:
+    - resource_aware_offloading
+    - latency_critical_offloading
+    - bandwidth_aware_offloading
+    - conflict_aware_offloading
+    - drift_aware_offloading
+    - priority_aware_offloading
+
+zero_shot:
+  name: "Zero-shot"
+  template: |
+    You are the initiator edge-cluster agent in an LLM-MR-CNP negotiation.
+    Your local cluster is overloaded and you must formulate a natural-language CFP for task offloading.
+
+    Task and local context:
+    {task_profile}
+
+    Qualitative warning:
+    {contextual_warning}
+
+    Allowed CFP intents: resource_aware_offloading, latency_critical_offloading, bandwidth_aware_offloading, conflict_aware_offloading, drift_aware_offloading, priority_aware_offloading.
+
+    Return only valid JSON:
+    {{
+      "cfp_intent": "one allowed CFP intent",
+      "cfp_keywords": ["important task or context keywords"],
+      "cfp_message": "short natural-language CFP sent to responder agents"
+    }}
+
+few_shot:
+  name: "Few-shot"
+  template: |
+    You are the initiator edge-cluster agent in an LLM-MR-CNP negotiation.
+    Your local cluster is overloaded and you must formulate a natural-language CFP for task offloading.
+
+    Examples:
+    Input: Low-latency stream task with strict deadline.
+    Output:
+    {{
+      "cfp_intent": "latency_critical_offloading",
+      "cfp_keywords": ["low_latency", "stream_task", "deadline"],
+      "cfp_message": "I request proposals for offloading a latency-critical stream task with strict deadline constraints."
+    }}
+
+    Input: Task has abnormal workload-spike warning not captured by prediction.
+    Output:
+    {{
+      "cfp_intent": "drift_aware_offloading",
+      "cfp_keywords": ["drift_awareness", "workload_burst", "future_saturation"],
+      "cfp_message": "I request proposals for offloading a stream task under possible workload drift and future saturation risk."
+    }}
+
+    Input: Generative-AI stream task requires reservation and conflict awareness.
+    Output:
+    {{
+      "cfp_intent": "conflict_aware_offloading",
+      "cfp_keywords": ["conflict_awareness", "genai_acceleration", "resource_reservation"],
+      "cfp_message": "I request proposals for a generative-AI stream task requiring GPU support and conflict-aware resource reservation."
+    }}
+
+    Current task and local context:
+    {task_profile}
+
+    Qualitative warning:
+    {contextual_warning}
+
+    Allowed CFP intents: resource_aware_offloading, latency_critical_offloading, bandwidth_aware_offloading, conflict_aware_offloading, drift_aware_offloading, priority_aware_offloading.
+
+    Return only valid JSON:
+    {{
+      "cfp_intent": "one allowed CFP intent",
+      "cfp_keywords": ["important task or context keywords"],
+      "cfp_message": "short natural-language CFP sent to responder agents"
+    }}
+
+cot:
+  name: "Chain-of-thought"
+  template: |
+    You are the initiator edge-cluster agent in an LLM-MR-CNP negotiation.
+    Think step by step internally about the task profile, local overload context, and qualitative warning, but do not reveal the reasoning chain.
+
+    Task and local context:
+    {task_profile}
+
+    Qualitative warning:
+    {contextual_warning}
+
+    Internally identify:
+    1. why offloading is required,
+    2. which CFP intent best describes the task,
+    3. which task/context keywords must be shared with responders.
+
+    Allowed CFP intents: resource_aware_offloading, latency_critical_offloading, bandwidth_aware_offloading, conflict_aware_offloading, drift_aware_offloading, priority_aware_offloading.
+
+    Return only valid JSON:
+    {{
+      "cfp_intent": "one allowed CFP intent",
+      "cfp_keywords": ["important task or context keywords"],
+      "cfp_message": "short natural-language CFP sent to responder agents"
+    }}
+
+react:
+  name: "ReAct"
+  template: |
+    You are the initiator edge-cluster agent in an LLM-MR-CNP negotiation.
+    Use the ReAct reasoning pattern:
+    Thought: reason about why offloading is required.
+    Action: identify the CFP formulation check to perform.
+    Observation: summarize the important task/context elements.
+    Final Decision: formulate the CFP.
+
+    Available structured action:
+    - identify_cfp_intent
+
+    Task and local context:
+    {task_profile}
+
+    Qualitative warning:
+    {contextual_warning}
+
+    Produce your answer using this format:
+    Thought: <brief reasoning about the offloading need>
+    Action: identify_cfp_intent
+    Observation: <important task/context elements>
+    Final Decision: <CFP intent>
+    Justification: <short explanation>
+    Final JSON:
+    {{
+      "cfp_intent": "one allowed CFP intent",
+      "cfp_keywords": ["important task or context keywords"],
+      "cfp_message": "short natural-language CFP sent to responder agents"
+    }}
+
+cot_few_shot:
+  name: "CoT + Few-shot"
+  template: |
+    You are the initiator edge-cluster agent in an LLM-MR-CNP negotiation.
+    Use the examples and think step by step internally. Return only the final JSON.
+
+    Examples:
+    Input: Low-latency stream task with strict deadline.
+    Output:
+    {{
+      "cfp_intent": "latency_critical_offloading",
+      "cfp_keywords": ["low_latency", "stream_task", "deadline"],
+      "cfp_message": "I request proposals for offloading a latency-critical stream task with strict deadline constraints."
+    }}
+
+    Input: Task has abnormal workload-spike warning not captured by prediction.
+    Output:
+    {{
+      "cfp_intent": "drift_aware_offloading",
+      "cfp_keywords": ["drift_awareness", "workload_burst", "future_saturation"],
+      "cfp_message": "I request proposals for offloading a stream task under possible workload drift and future saturation risk."
+    }}
+
+    Current task and local context:
+    {task_profile}
+
+    Qualitative warning:
+    {contextual_warning}
+
+    Internally identify the adaptation reason, CFP intent, and minimum useful context for responders.
+
+    Return only valid JSON:
+    {{
+      "cfp_intent": "one allowed CFP intent",
+      "cfp_keywords": ["important task or context keywords"],
+      "cfp_message": "short natural-language CFP sent to responder agents"
+    }}
+
+react_few_shot:
+  name: "ReAct + Few-shot"
+  template: |
+    You are the initiator edge-cluster agent in an LLM-MR-CNP negotiation.
+    Use the examples and then follow the ReAct pattern.
+
+    Examples:
+    Input: Conflict-aware generative AI task with resource contention warning.
+    Output:
+    Thought: The task requires GPU support and conflict-aware reservation.
+    Action: identify_cfp_intent
+    Observation: The CFP must emphasize generative-AI acceleration and resource contention.
+    Final Decision: conflict_aware_offloading
+    Justification: Responders need to evaluate conflict risk before proposing.
+    Final JSON:
+    {{
+      "cfp_intent": "conflict_aware_offloading",
+      "cfp_keywords": ["conflict_awareness", "genai_acceleration", "resource_reservation"],
+      "cfp_message": "I request proposals for a generative-AI stream task requiring GPU support and conflict-aware resource reservation."
+    }}
+
+    Input: Drift-aware stream task with future saturation warning.
+    Output:
+    Thought: The qualitative warning indicates possible prediction failure.
+    Action: identify_cfp_intent
+    Observation: The CFP must highlight workload drift and future saturation.
+    Final Decision: drift_aware_offloading
+    Justification: Responders must consider future instability before accepting.
+    Final JSON:
+    {{
+      "cfp_intent": "drift_aware_offloading",
+      "cfp_keywords": ["drift_awareness", "workload_burst", "future_saturation"],
+      "cfp_message": "I request proposals for offloading a stream task under possible workload drift and future saturation risk."
+    }}
+
+    Current task and local context:
+    {task_profile}
+
+    Qualitative warning:
+    {contextual_warning}
+
+    Produce your answer using this format:
+    Thought: <brief reasoning about the offloading need>
+    Action: identify_cfp_intent
+    Observation: <important task/context elements>
+    Final Decision: <CFP intent>
+    Justification: <short explanation>
+    Final JSON:
+    {{
+      "cfp_intent": "one allowed CFP intent",
+      "cfp_keywords": ["important task or context keywords"],
+      "cfp_message": "short natural-language CFP sent to responder agents"
+    }}
+
+react_few_shot_cot:
+  name: "ReAct + Few-shot + CoT"
+  template: |
+    You are the initiator edge-cluster agent in an LLM-MR-CNP negotiation.
+    Use the examples, reason step by step, and follow the ReAct pattern.
+
+    Examples:
+    Input: Low-latency stream task with strict deadline.
+    Output:
+    Thought: The task is latency-critical, so the CFP must emphasize deadline preservation.
+    Action: identify_cfp_intent
+    Observation: The correct intent is latency-critical offloading.
+    Final Decision: latency_critical_offloading
+    Justification: Responders must evaluate deadline risk.
+    Final JSON:
+    {{
+      "cfp_intent": "latency_critical_offloading",
+      "cfp_keywords": ["low_latency", "stream_task", "deadline"],
+      "cfp_message": "I request proposals for offloading a latency-critical stream task with strict deadline constraints."
+    }}
+
+    Input: High-bandwidth vision stream with contention warning.
+    Output:
+    Thought: The task requires bandwidth and conflict-aware reservation under contention.
+    Action: identify_cfp_intent
+    Observation: The CFP should emphasize bandwidth, priority, and conflict risk.
+    Final Decision: conflict_aware_offloading
+    Justification: Responders must evaluate resource contention before accepting.
+    Final JSON:
+    {{
+      "cfp_intent": "conflict_aware_offloading",
+      "cfp_keywords": ["conflict_awareness", "high_bandwidth", "priority_awareness", "resource_reservation"],
+      "cfp_message": "I request proposals for a high-bandwidth stream task requiring priority-aware and conflict-aware resource reservation."
+    }}
+
+    Current task and local context:
+    {task_profile}
+
+    Qualitative warning:
+    {contextual_warning}
+
+    Step by step, identify the adaptation reason, CFP intent, and necessary context for responders.
+    Produce your answer using this format:
+    Thought: <brief step-by-step reasoning>
+    Action: identify_cfp_intent
+    Observation: <important task/context elements>
+    Final Decision: <CFP intent>
+    Justification: <short explanation>
+    Final JSON:
+    {{
+      "cfp_intent": "one allowed CFP intent",
+      "cfp_keywords": ["important task or context keywords"],
+      "cfp_message": "short natural-language CFP sent to responder agents"
+    }}

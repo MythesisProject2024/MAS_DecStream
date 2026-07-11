@@ -1,0 +1,2 @@
+strategy,llm_label,cases,cfp_intent_accuracy,cfp_keyword_coverage,cfp_accuracy,offloading_accuracy,responder_action_accuracy,avg_negotiation_rounds,avg_decision_time_ms,prompt_tokens_est,completion_tokens_est,total_tokens_est
+react_few_shot_cot,ollama(llama3),25,0.4400,0.2573,0.3852,0.9600,0.5948,1.76,135562.18,45724,12478,58202
